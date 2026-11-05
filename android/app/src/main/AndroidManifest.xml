@@ -21,6 +21,10 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       tools:targetApi="n">
+      <service
+        android:name="com.guichaguri.trackplayer.service.MusicService"
+        android:foregroundServiceType="mediaPlayback" />
+
       <activity
         android:name=".MainActivity"
         android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
