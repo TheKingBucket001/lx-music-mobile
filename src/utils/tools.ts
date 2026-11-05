@@ -1,5 +1,4 @@
 import { Platform, ToastAndroid, BackHandler, Linking, Dimensions, Alert, Appearance, PermissionsAndroid, AppState, StyleSheet, type ScaledSize } from 'react-native'
-// import ExtraDimensions from 'react-native-extra-dimensions-android'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { storageDataPrefix } from '@/config/constant'
 import { gzipFile, readFile, temporaryDirectoryPath, unGzipFile, unlink, writeFile } from '@/utils/fs'
@@ -15,11 +14,6 @@ import { windowSizeTools } from '@/utils/windowSizeTools'
 
 // https://stackoverflow.com/a/47349998
 export const getDeviceLanguage = async() => {
-  // let deviceLanguage = Platform.OS === 'ios'
-  //   ? NativeModules.SettingsManager.settings.AppleLocale ||
-  //     NativeModules.SettingsManager.settings.AppleLanguages[0] // iOS 13
-  //   : await getSystemLocales()
-  // deviceLanguage = typeof deviceLanguage === 'string' ? deviceLanguage.substring(0, 5).toLocaleLowerCase() : ''
   return getSystemLocales()
 }
 
@@ -32,29 +26,6 @@ export const isActive = () => AppState.currentState == 'active'
 
 export const TEMP_FILE_PATH = temporaryDirectoryPath + '/tempFile'
 
-// fix https://github.com/facebook/react-native/issues/4934
-// export const getWindowSise = (windowDimensions?: ReturnType<(typeof Dimensions)['get']>) => {
-//   return windowSizeTools.getSize()
-//   // windowDimensions ??= Dimensions.get('window')
-//   // if (Platform.OS === 'ios') return windowDimensions
-//   // return windowDimensions
-//   // const windowSize = {
-//   //   width: ExtraDimensions.getRealWindowWidth(),
-//   //   height: ExtraDimensions.getRealWindowHeight(),
-//   // }
-//   // if (
-//   //   (windowDimensions.height > windowDimensions.width && windowSize.height < windowSize.width) ||
-//   //   (windowDimensions.width > windowDimensions.height && windowSize.width < windowSize.height)
-//   // ) {
-//   //   windowSize.height = windowSize.width
-//   // }
-//   // windowSize.width = windowDimensions.width
-
-//   // if (ExtraDimensions.isSoftMenuBarEnabled()) {
-//   //   windowSize.height -= ExtraDimensions.getSoftMenuBarHeight()
-//   // }
-//   // return windowSize
-// }
 
 export const checkStoragePermissions = async() => PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
 
