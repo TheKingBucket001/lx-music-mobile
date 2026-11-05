@@ -1,3 +1,9 @@
+# 自用
+
+本 Fork 仅供本人自用。我完全拥护并遵守[原作者在上游仓库中的项目协议](https://github.com/lyswhut/lx-music-mobile#项目协议)，包括版权数据须在 24 小时内清除以及遵守当地法律法规。本 Fork 不代表上游官方发布。
+
+---
+
 <p align="center"><a href="https://github.com/lyswhut/lx-music-mobile"><img width="200" src="https://github.com/lyswhut/lx-music-mobile/blob/master/doc/images/icon.png" alt="lx-music logo"></a></p>
 
 <h1 align="center">LX Music 移动版</h1>
