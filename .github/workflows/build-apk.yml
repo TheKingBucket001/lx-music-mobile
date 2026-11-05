@@ -2,13 +2,16 @@ name: Build signed APK
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
@@ -17,6 +20,17 @@ jobs:
 
       - name: Set up build environment
         uses: ./.github/actions/setup
+
+      - name: Verify release tag version
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          expected_tag="v$package_version"
+          if [[ "$GITHUB_REF_NAME" != "$expected_tag" ]]; then
+            echo "::error title=Release tag mismatch::Expected $expected_tag, got $GITHUB_REF_NAME"
+            exit 1
+          fi
 
       - name: Build signed release APKs
         env:
@@ -62,3 +76,14 @@ jobs:
           path: android/app/build/outputs/apk/release/*arm64-v8a.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create "$GITHUB_REF_NAME" android/app/build/outputs/apk/release/*arm64-v8a.apk \
+            --title "$GITHUB_REF_NAME" \
+            --notes "" \
+            --verify-tag
