@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
+        if: env.PAT != ''
         uses: peter-evans/repository-dispatch@v2
+        env:
+          PAT: ${{ secrets.PAT }}
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ env.PAT }}
           repository: lyswhut/lx-music-mobile-version-info
           event-type: npm-release
