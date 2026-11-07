@@ -2,11 +2,12 @@
 import TrackPlayer, { State as TPState, Event as TPEvent } from 'react-native-track-player'
 // import { store } from '@/store'
 // import { action as playerAction, STATUS } from '@/store/modules/player'
-import { destroy as destroyPlayer, isTempId, isEmpty } from './utils'
+import { isTempId, isEmpty } from './utils'
 // import { play as lrcPlay, pause as lrcPause } from '@/core/lyric'
 import { exitApp } from '@/core/common'
 import { getCurrentTrackId } from './playList'
 import { pause, play, playNext, playPrev } from '@/core/player/player'
+import { log } from '@/utils/log'
 
 let isInitialized = false
 
@@ -25,9 +26,8 @@ const handleExitApp = async(reason: string) => {
 
 const handleRemoteStop = async() => {
   global.lx.isPlayedStop = false
-  await destroyPlayer()
-  global.app_event.playerPause()
-  global.app_event.pause()
+  log.info('TrackPlayer RemoteStop')
+  await pause()
 }
 
 
@@ -36,12 +36,12 @@ const registerPlaybackService = async() => {
 
   console.log('reg services...')
   TrackPlayer.addEventListener(TPEvent.RemotePlay, () => {
-    // console.log('remote-play')
+    log.info('TrackPlayer RemotePlay')
     play()
   })
 
   TrackPlayer.addEventListener(TPEvent.RemotePause, () => {
-    // console.log('remote-pause')
+    log.info('TrackPlayer RemotePause')
     void pause()
   })
 
@@ -74,6 +74,7 @@ const registerPlaybackService = async() => {
   // })
 
   TrackPlayer.addEventListener(TPEvent.PlaybackError, async(err: any) => {
+    log.error('TrackPlayer PlaybackError', { code: err?.code })
     console.log('playback-error', err)
     global.app_event.error()
     global.app_event.playerError()
@@ -84,6 +85,7 @@ const registerPlaybackService = async() => {
   })
 
   TrackPlayer.addEventListener(TPEvent.PlaybackState, async info => {
+    log.info('TrackPlayer PlaybackState', info)
     if (global.lx.gettingUrlId || isTempId()) return
     // let currentIsPlaying = false
 

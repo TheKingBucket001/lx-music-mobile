@@ -28,6 +28,7 @@ import { checkIgnoringBatteryOptimization, checkNotificationPermission, debounce
 import { LIST_IDS } from '@/config/constant'
 import { addListMusics, removeListMusics } from '@/core/list'
 import { addDislikeInfo } from '@/core/dislikeList'
+import { log } from '@/utils/log'
 
 // import { checkMusicFileAvailable } from '@renderer/utils/music'
 
@@ -595,6 +596,13 @@ export const playPrev = async(isAutoToggle = false): Promise<void> => {
  * 恢复播放
  */
 export const play = () => {
+  log.info('Player resume requested', {
+    initialized: isInitialized(),
+    initializing: global.lx.playerStatus.isIniting,
+    hasMusic: playerState.playMusicInfo.musicInfo != null,
+    empty: isEmpty(),
+    gettingUrl: !!global.lx.gettingUrlId,
+  })
   if (playerState.playMusicInfo.musicInfo == null) return
   if (isEmpty()) {
     if (createGettingUrlId(playerState.playMusicInfo.musicInfo) != global.lx.gettingUrlId) setMusicUrl(playerState.playMusicInfo.musicInfo)
@@ -624,6 +632,7 @@ export const stop = async() => {
  * 播放、暂停播放切换
  */
 export const togglePlay = () => {
+  log.info('Player toggle requested', { isPlaying: playerState.isPlay })
   global.lx.isPlayedStop &&= false
   if (playerState.isPlay) {
     void pause()

@@ -3,6 +3,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import { playMusic as handlePlayMusic } from './playList'
 import { existsFile, moveFile, privateStorageDirectoryPath, temporaryDirectoryPath } from '@/utils/fs'
 import { toast } from '@/utils/tools'
+import { log } from '@/utils/log'
 // import { PlayerMusicInfo } from '@/store/modules/player/playInfo'
 
 
@@ -199,9 +200,16 @@ export const migratePlayerCache = async() => {
 }
 
 export const destroy = async() => {
+  log.info('TrackPlayer destroy requested', {
+    initialized: global.lx.playerStatus.isInitialized,
+    initializing: global.lx.playerStatus.isIniting,
+    trackEmpty: isEmpty(),
+    trackTemporary: isTempId(),
+  }, new Error('Player destroy caller'))
   if (global.lx.playerStatus.isIniting || !global.lx.playerStatus.isInitialized) return
   await TrackPlayer.destroy()
   global.lx.playerStatus.isInitialized = false
+  log.info('TrackPlayer destroyed')
 }
 
 type PlayStatus = 'None' | 'Ready' | 'Playing' | 'Paused' | 'Stopped' | 'Buffering' | 'Connecting'
