@@ -57,10 +57,11 @@ def main():
                        for name in archive.namelist())
 
     badging = aapt('dump', 'badging', str(apk))
-    assert "name='dev.bucket.lxmusic.stopfix'" in badging
-    assert "versionName='0.2.0'" in badging
-    assert "versionCode='2'" in badging
+    assert "name='lx.fix'" in badging
+    assert "versionName='0.2.1'" in badging
+    assert "versionCode='3'" in badging
     manifest = aapt('dump', 'xmltree', str(apk), 'AndroidManifest.xml')
+    assert 'android:icon' in manifest
     assert not re.search(r'E: (?:uses-permission|permission|activity|service|receiver|provider)\b', manifest)
     for field in ['xposedmodule', 'xposedminversion', 'xposedscope', 'xposeddescription']:
         assert f'"{field}"' in manifest, field

@@ -104,7 +104,7 @@ public final class MediaServiceTypeHookTest {
         boolean unchangedArgs = true;
         for (int i = 0; i < args.length; i++) if (i != 6) unchangedArgs &= args[i] == previousArgs[i];
         check(unchangedArgs, "only the ServiceInfo constructor argument is replaced");
-        check(XposedBridge.logs.size() == 2 && XposedBridge.logs.get(0).contains("0.2.0")
+        check(XposedBridge.logs.size() == 2 && XposedBridge.logs.get(0).contains("0.2.1")
                         && XposedBridge.logs.get(0).contains("installed ServiceRecord")
                         && XposedBridge.logs.get(1).contains("mediaPlayback 0x0 -> 0x2"),
                 "installation and metadata rewrite logs are distinguishable");

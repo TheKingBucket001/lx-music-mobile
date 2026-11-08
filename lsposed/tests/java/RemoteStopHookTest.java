@@ -45,7 +45,7 @@ public final class RemoteStopHookTest {
                         && registration.method.getParameterTypes().length == 1
                         && registration.method.getParameterTypes()[0] == String.class,
                 "only exact framework Intent.getStringExtra(String) is hooked");
-        check(XposedBridge.logs.size() == 1 && XposedBridge.logs.get(0).contains("0.2.0")
+        check(XposedBridge.logs.size() == 1 && XposedBridge.logs.get(0).contains("0.2.1")
                         && XposedBridge.logs.get(0).contains("installed"),
                 "one installation log includes module version");
 

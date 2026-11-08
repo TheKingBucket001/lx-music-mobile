@@ -1,6 +1,6 @@
 # LX 播放恢复（LSPosed）
 
-给官方 LX Music 1.9.2 使用的独立测试模块，版本 0.2.0。它把媒体停止指令转为暂停，保留播放器；同时在 Android 16 系统创建 LX 播放服务时，为该服务记录补齐 `mediaPlayback` 类型。无需修改 LX Music APK。
+给官方 LX Music 1.9.2 使用的独立测试模块，版本 0.2.1，包名 `lx.fix`，使用 LX 原图标。它把媒体停止指令转为暂停，保留播放器；同时在 Android 16 系统创建 LX 播放服务时，为该服务记录补齐 `mediaPlayback` 类型。无需修改 LX Music APK。
 
 ## 使用
 
@@ -30,7 +30,7 @@
 - Hook 使用 Android 系统方法，避开了原版播放器内部类和方法的混淆名称。其他 LX 版本需要重新核对调用链，不保证兼容。
 - 20 项事件转换检查、27 项系统元数据检查和 Android 编译验证不等于 ART 上的 Hook 已生效。首次启用后仍需一次原版 LX 的真机复测。
 
-LSPosed 日志前缀为 `LXMusicStopFix 0.2.0`：
+LSPosed 日志前缀为 `LXMusicStopFix 0.2.1`：
 
 - `installed Intent.getStringExtra`：应用事件 Hook 已装入；`remote-stop -> remote-pause; reads=N`：实际改写了事件读取。`reads` 是读取次数，不是去重后的系统指令数。
 - `installed ServiceRecord`：系统构造器 Hook 已装入；`mediaPlayback 0x0 -> 0x2`：已为目标服务记录替换元数据副本。

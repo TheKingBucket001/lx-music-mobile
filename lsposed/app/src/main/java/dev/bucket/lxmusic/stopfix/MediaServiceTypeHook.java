@@ -18,7 +18,7 @@ public final class MediaServiceTypeHook implements IXposedHookLoadPackage {
     private static final String TARGET_PACKAGE = "cn.toside.music.mobile";
     private static final String TARGET_SERVICE =
             "com.guichaguri.trackplayer.service.MusicService";
-    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.0";
+    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.1";
     private static final int MEDIA_PLAYBACK = 2;
     private static final String[] CONSTRUCTOR_TYPES = {
             "com.android.server.am.ActivityManagerService",
