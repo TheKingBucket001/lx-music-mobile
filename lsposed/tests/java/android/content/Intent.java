@@ -5,6 +5,7 @@ import java.util.Map;
 
 // JVM test double only; never part of the Android module source set.
 public final class Intent {
+    public static final class FilterComparison {}
     private final String action;
     private final Map<String, String> extras = new HashMap<>();
     public RuntimeException readFailure;

@@ -13,7 +13,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public final class RemoteStopHook implements IXposedHookLoadPackage {
     private static final String TARGET_PACKAGE = "cn.toside.music.mobile";
     private static final String EVENT_ACTION = "com.guichaguri.trackplayer.event";
-    private static final String LOG_PREFIX = "LXMusicStopFix 0.1.0";
+    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.0";
 
     private final AtomicInteger rewrittenReads = new AtomicInteger();
     private boolean installed;

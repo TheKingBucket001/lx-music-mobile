@@ -17,7 +17,7 @@ def main():
     args = parser.parse_args()
     tests = Path(__file__).resolve().parent
     module = tests.parent
-    production = module / 'app/src/main/java/dev/bucket/lxmusic/stopfix/RemoteStopHook.java'
+    production = sorted((module / 'app/src/main/java').rglob('*.java'))
     javac = shutil.which('javac')
     java = shutil.which('java')
     if not javac or not java:
@@ -26,15 +26,17 @@ def main():
         build = Path(output)
         behavior = build / 'behavior'
         behavior.mkdir()
-        sources = [production, *sorted((tests / 'java').rglob('*.java'))]
+        sources = [*production, *sorted((tests / 'java').rglob('*.java'))]
         subprocess.run([javac, '--release', '8', '-encoding', 'UTF-8', '-d', str(behavior), *map(str, sources)], check=True)
         subprocess.run([java, '-cp', str(behavior), 'RemoteStopHookTest'], check=True)
+        subprocess.run([java, '-cp', str(behavior), 'MediaServiceTypeHookTest'], check=True)
         if args.xposed_api:
             api = args.xposed_api.resolve(strict=True)
             compatibility = build / 'api-compatibility'
             compatibility.mkdir()
             subprocess.run([javac, '--release', '8', '-encoding', 'UTF-8', '-cp', str(api), '-d', str(compatibility),
-                            str(tests / 'java/android/content/Intent.java'), str(production)], check=True)
+                            *map(str, sorted((tests / 'java/android').rglob('*.java'))),
+                            *map(str, production)], check=True)
             print('PASS production Hook compiles against the supplied real Xposed API jar.', flush=True)
 
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LX 播放恢复</string>
-    <string name="module_description">将 LX Music 的媒体停止指令转为暂停，保留播放器，便于息屏或蓝牙重连后继续播放。作用域仅选择 LX Music。</string>
+    <string name="module_description">保留 LX Music 播放器，并在 Android 16 为其播放服务补齐 mediaPlayback 类型。作用域选择 LX Music 与系统框架；启用后重启手机。</string>
     <string-array name="xposed_scope">
         <item>cn.toside.music.mobile</item>
+        <item>android</item>
     </string-array>
 </resources>
