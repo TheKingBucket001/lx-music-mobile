@@ -33,6 +33,9 @@ public final class MediaServiceTypeHookTest {
         Field field = MediaServiceTypeHook.class.getDeclaredField("installationAttempted");
         field.setAccessible(true);
         field.setBoolean(null, false);
+        Field logged = MediaServiceTypeHook.class.getDeclaredField("rewriteLogged");
+        logged.setAccessible(true);
+        ((java.util.concurrent.atomic.AtomicBoolean) logged.get(null)).set(false);
         XposedBridge.constructors.clear();
         XposedBridge.logs.clear();
         ServiceRecord.calls = 0;
@@ -104,11 +107,21 @@ public final class MediaServiceTypeHookTest {
         boolean unchangedArgs = true;
         for (int i = 0; i < args.length; i++) if (i != 6) unchangedArgs &= args[i] == previousArgs[i];
         check(unchangedArgs, "only the ServiceInfo constructor argument is replaced");
-        check(XposedBridge.logs.size() == 2 && XposedBridge.logs.get(0).contains("0.2.1")
+        check(XposedBridge.logs.size() == 2 && XposedBridge.logs.get(0).contains("0.2.2")
                         && XposedBridge.logs.get(0).contains("installed ServiceRecord")
                         && XposedBridge.logs.get(1).contains("mediaPlayback 0x0 -> 0x2"),
                 "installation and metadata rewrite logs are distinguishable");
         unchanged(hook, arguments(copy), "already corrected metadata is not copied again");
+        boolean laterRecordsCorrected = true;
+        for (int i = 0; i < 1000; i++) {
+            ServiceInfo next = targetInfo();
+            ServiceRecord later = (ServiceRecord) hook.invoke(arguments(next));
+            laterRecordsCorrected &= later.serviceInfo != next
+                    && later.serviceInfo.getForegroundServiceType() == 2
+                    && next.getForegroundServiceType() == 0;
+        }
+        check(laterRecordsCorrected && XposedBridge.logs.size() == 2,
+                "1000 later LX service records are corrected without additional logs");
 
         ServiceInfo other = targetInfo(); other.packageName += ".other";
         unchanged(hook, arguments(other), "another package is unchanged");

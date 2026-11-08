@@ -2,7 +2,7 @@ package dev.bucket.lxmusic.stopfix;
 
 import android.content.Intent;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -13,9 +13,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public final class RemoteStopHook implements IXposedHookLoadPackage {
     private static final String TARGET_PACKAGE = "cn.toside.music.mobile";
     private static final String EVENT_ACTION = "com.guichaguri.trackplayer.event";
-    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.1";
+    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.2";
 
-    private final AtomicInteger rewrittenReads = new AtomicInteger();
+    private final AtomicBoolean rewriteLogged = new AtomicBoolean();
     private boolean installed;
 
     @Override
@@ -40,12 +40,20 @@ public final class RemoteStopHook implements IXposedHookLoadPackage {
                             return;
                         }
                         param.setResult("remote-pause");
-                        XposedBridge.log(LOG_PREFIX + " remote-stop -> remote-pause; reads="
-                                + rewrittenReads.incrementAndGet());
+                        if (rewriteLogged.compareAndSet(false, true)) {
+                            log("remote-stop -> remote-pause (first match)");
+                        }
                     }
                 });
         installed = true;
-        XposedBridge.log(LOG_PREFIX + " installed Intent.getStringExtra(String); process="
-                + packageParam.processName);
+        log("installed Intent.getStringExtra(String); process=" + packageParam.processName);
+    }
+
+    private static void log(String message) {
+        try {
+            XposedBridge.log(LOG_PREFIX + " " + message);
+        } catch (Throwable ignored) {
+            // Logging must not interfere with the event conversion.
+        }
     }
 }

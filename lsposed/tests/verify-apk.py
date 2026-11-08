@@ -58,8 +58,8 @@ def main():
 
     badging = aapt('dump', 'badging', str(apk))
     assert "name='lx.fix'" in badging
-    assert "versionName='0.2.1'" in badging
-    assert "versionCode='3'" in badging
+    assert "versionName='0.2.2'" in badging
+    assert "versionCode='4'" in badging
     manifest = aapt('dump', 'xmltree', str(apk), 'AndroidManifest.xml')
     assert 'android:icon' in manifest
     assert not re.search(r'E: (?:uses-permission|permission|activity|service|receiver|provider)\b', manifest)

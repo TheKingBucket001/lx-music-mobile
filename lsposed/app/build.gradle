@@ -11,8 +11,8 @@ android {
         applicationId 'lx.fix'
         minSdk 26
         targetSdk 35
-        versionCode 3
-        versionName '0.2.1'
+        versionCode 4
+        versionName '0.2.2'
     }
 
     def signingStore = System.getenv('LX_STOP_FIX_KEYSTORE')

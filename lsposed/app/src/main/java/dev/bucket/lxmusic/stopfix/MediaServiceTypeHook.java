@@ -18,7 +18,7 @@ public final class MediaServiceTypeHook implements IXposedHookLoadPackage {
     private static final String TARGET_PACKAGE = "cn.toside.music.mobile";
     private static final String TARGET_SERVICE =
             "com.guichaguri.trackplayer.service.MusicService";
-    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.1";
+    private static final String LOG_PREFIX = "LXMusicStopFix 0.2.2";
     private static final int MEDIA_PLAYBACK = 2;
     private static final String[] CONSTRUCTOR_TYPES = {
             "com.android.server.am.ActivityManagerService",
@@ -36,6 +36,7 @@ public final class MediaServiceTypeHook implements IXposedHookLoadPackage {
             "boolean"
     };
     private static final AtomicBoolean failureLogged = new AtomicBoolean();
+    private static final AtomicBoolean rewriteLogged = new AtomicBoolean();
     private static boolean installationAttempted;
 
     @Override
@@ -99,7 +100,10 @@ public final class MediaServiceTypeHook implements IXposedHookLoadPackage {
                         ServiceInfo replacement = new ServiceInfo(original);
                         typeField.setInt(replacement, MEDIA_PLAYBACK);
                         param.args[6] = replacement;
-                        log("mediaPlayback 0x0 -> 0x2; " + TARGET_PACKAGE + "/" + TARGET_SERVICE);
+                        if (rewriteLogged.compareAndSet(false, true)) {
+                            log("mediaPlayback 0x0 -> 0x2 (first match); "
+                                    + TARGET_PACKAGE + "/" + TARGET_SERVICE);
+                        }
                     } catch (Throwable failure) {
                         logFailureOnce("system callback failed", failure);
                     }

@@ -1,6 +1,6 @@
 # LX 播放恢复（LSPosed）
 
-给官方 LX Music 1.9.2 使用的独立测试模块，版本 0.2.1，包名 `lx.fix`，使用 LX 原图标。它把媒体停止指令转为暂停，保留播放器；同时在 Android 16 系统创建 LX 播放服务时，为该服务记录补齐 `mediaPlayback` 类型。无需修改 LX Music APK。
+给官方 LX Music 1.9.2 使用的独立测试模块，版本 0.2.2，包名 `lx.fix`，使用 LX 原图标。它把媒体停止指令转为暂停，保留播放器；同时在 Android 16 系统创建 LX 播放服务时，为该服务记录补齐 `mediaPlayback` 类型。无需修改 LX Music APK。
 
 ## 使用
 
@@ -28,12 +28,14 @@
 - 目标 APK：官方 LX Music **1.9.2 / ARM64**。已核对官方发布包的签名、哈希和 DEX：它仍通过 `Intent.getStringExtra("event")` 将 TrackPlayer 事件交给 React Native。
 - 需要支持经典 Xposed API 82 的 LSPosed。Stop 转暂停部分最低 Android 8.0；**服务类型补齐仅在 Android 16 / SDK 36 装载**，已核对用户设备实际系统包的构造器和字段。其他版本会记录不支持并跳过系统部分。
 - Hook 使用 Android 系统方法，避开了原版播放器内部类和方法的混淆名称。其他 LX 版本需要重新核对调用链，不保证兼容。
-- 20 项事件转换检查、27 项系统元数据检查和 Android 编译验证不等于 ART 上的 Hook 已生效。首次启用后仍需一次原版 LX 的真机复测。
+- 21 项事件转换检查、28 项系统元数据检查和 Android 编译验证不等于 ART 上的 Hook 已生效。首次启用后仍需一次原版 LX 的真机复测。
 
-LSPosed 日志前缀为 `LXMusicStopFix 0.2.1`：
+LSPosed 日志前缀为 `LXMusicStopFix 0.2.2`：
 
-- `installed Intent.getStringExtra`：应用事件 Hook 已装入；`remote-stop -> remote-pause; reads=N`：实际改写了事件读取。`reads` 是读取次数，不是去重后的系统指令数。
-- `installed ServiceRecord`：系统构造器 Hook 已装入；`mediaPlayback 0x0 -> 0x2`：已为目标服务记录替换元数据副本。
+- `installed Intent.getStringExtra`：应用事件 Hook 已装入；`remote-stop -> remote-pause (first match)`：该 LX 进程首次成功改写事件读取。
+- `installed ServiceRecord`：系统构造器 Hook 已装入；`mediaPlayback 0x0 -> 0x2 (first match)`：本次系统进程首次为目标服务记录替换元数据副本。
+
+应用部分每个 LX 进程最多两条正常日志；系统部分每次系统进程运行最多两条正常日志，内部故障最多另记一条。重复 Stop 或服务重建仍照常处理，不重复输出成功日志。没有定时日志或独立日志文件；LX 原有日志及其他模块的日志不由本模块控制。
 
 服务类型仍需以 `adb shell dumpsys activity services cn.toside.music.mobile` 中该播放器服务的 `types=0x00000002` 为准，单看模块日志不足以确认系统运行状态。模块不记录歌曲地址或音源信息。
 

@@ -45,7 +45,7 @@ public final class RemoteStopHookTest {
                         && registration.method.getParameterTypes().length == 1
                         && registration.method.getParameterTypes()[0] == String.class,
                 "only exact framework Intent.getStringExtra(String) is hooked");
-        check(XposedBridge.logs.size() == 1 && XposedBridge.logs.get(0).contains("0.2.1")
+        check(XposedBridge.logs.size() == 1 && XposedBridge.logs.get(0).contains("0.2.2")
                         && XposedBridge.logs.get(0).contains("installed"),
                 "one installation log includes module version");
 
@@ -55,9 +55,14 @@ public final class RemoteStopHookTest {
                         && "unchanged".equals(stop.getStringExtra("other")) && ACTION.equals(stop.getAction()),
                 "Intent data and action remain unchanged");
         check("remote-pause".equals(registration.invoke(stop, "event")), "repeated Stop read still becomes Pause");
-        check(XposedBridge.logs.size() == 3 && XposedBridge.logs.get(1).endsWith("reads=1")
-                        && XposedBridge.logs.get(2).endsWith("reads=2"),
-                "matching reads produce incrementing diagnostic counters");
+        check(XposedBridge.logs.size() == 2 && XposedBridge.logs.get(1).contains("first match"),
+                "matching reads log only the first conversion");
+        boolean repeatedReadsConverted = true;
+        for (int i = 0; i < 1000; i++) {
+            repeatedReadsConverted &= "remote-pause".equals(registration.invoke(stop, "event"));
+        }
+        check(repeatedReadsConverted && XposedBridge.logs.size() == 2,
+                "1000 later Stop reads still convert without additional logs");
 
         check("remote-stop".equals(registration.invoke(event("unrelated.action", "event", "remote-stop"), "event")),
                 "unrelated action is unchanged");
@@ -88,7 +93,7 @@ public final class RemoteStopHookTest {
             sameFailure = failure == originalFailure;
         }
         check(sameFailure, "original Intent exception is preserved without replacement");
-        check(XposedBridge.logs.size() == 3, "nonmatches and failed reads do not log a rewrite");
+        check(XposedBridge.logs.size() == 2, "nonmatches and failed reads do not log a rewrite");
 
         // Structural check only: real Android native teardown is outside this JVM test.
         // User Exit does not use this Intent event route, and no destroy/exit hook is installed.
