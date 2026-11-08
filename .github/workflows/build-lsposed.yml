@@ -1,0 +1,69 @@
+name: Build LX LSPosed module
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: |
+            lsposed/**/*.gradle
+            android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Check module behavior
+        run: python3 lsposed/tests/run-jvm-tests.py --xposed-api lsposed/app/libs/xposed-api-82.jar
+
+      - name: Verify Xposed compile API
+        run: |
+          echo 'f48c635f1c7469fdec0e00ad2ea0b7a6b2f5b55065784a35b7ca3a84615e8e25  lsposed/app/libs/xposed-api-82.jar' | sha256sum --check
+
+      - name: Set up Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0'
+
+      - name: Build signed module
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          LX_STOP_FIX_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          LX_STOP_FIX_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          LX_STOP_FIX_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for secret_name in ANDROID_KEYSTORE_BASE64 LX_STOP_FIX_STORE_PASSWORD LX_STOP_FIX_KEY_ALIAS LX_STOP_FIX_KEY_PASSWORD; do
+            if [[ -z "${!secret_name:-}" ]]; then
+              echo "::error::Missing signing secret: $secret_name"
+              exit 1
+            fi
+          done
+          export LX_STOP_FIX_KEYSTORE="$RUNNER_TEMP/lx-stop-fix.keystore"
+          trap 'rm -f "$LX_STOP_FIX_KEYSTORE"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$LX_STOP_FIX_KEYSTORE"
+          chmod 600 "$LX_STOP_FIX_KEYSTORE"
+          bash android/gradlew -p lsposed --no-daemon :app:lintRelease :app:assembleRelease
+
+      - name: Verify module APK contents
+        run: |
+          python3 lsposed/tests/verify-apk.py lsposed/app/build/outputs/apk/release/app-release.apk --aapt "$ANDROID_HOME/build-tools/36.0.0/aapt"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose lsposed/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload module APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lx-stop-fix-lsposed-${{ github.run_number }}
+          path: lsposed/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30

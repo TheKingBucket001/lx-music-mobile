@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'dev.bucket.lxmusic.stopfix'
+    compileSdk 35
+    buildToolsVersion '36.0.0'
+
+    defaultConfig {
+        applicationId 'dev.bucket.lxmusic.stopfix'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    def signingStore = System.getenv('LX_STOP_FIX_KEYSTORE')
+    if (signingStore) {
+        signingConfigs {
+            release {
+                storeFile file(signingStore)
+                storePassword System.getenv('LX_STOP_FIX_STORE_PASSWORD')
+                keyAlias System.getenv('LX_STOP_FIX_KEY_ALIAS')
+                keyPassword System.getenv('LX_STOP_FIX_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // The module is small; retain the entry class and readable stack traces.
+            minifyEnabled false
+            if (signingStore) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // Supplied by LSPosed at runtime; never include this API in the APK.
+    compileOnly files('libs/xposed-api-82.jar')
+}
