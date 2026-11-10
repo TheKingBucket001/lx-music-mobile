@@ -25,11 +25,11 @@ jobs:
             android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Check module behavior
-        run: python3 lsposed/tests/run-jvm-tests.py --xposed-api lsposed/app/libs/xposed-api-82.jar
+        run: python3 lsposed/tests/run-jvm-tests.py --xposed-api lsposed/app/libs/libxposed-api-102.jar
 
       - name: Verify Xposed compile API
         run: |
-          echo 'f48c635f1c7469fdec0e00ad2ea0b7a6b2f5b55065784a35b7ca3a84615e8e25  lsposed/app/libs/xposed-api-82.jar' | sha256sum --check
+          echo 'a515dd7a53cd7a47c05e101dff77d61acb3091a97b20a885b9ea3494412db985  lsposed/app/libs/libxposed-api-102.jar' | sha256sum --check
 
       - name: Set up Android tools
         uses: android-actions/setup-android@v3

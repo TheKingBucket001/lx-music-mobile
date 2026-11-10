@@ -1,6 +1,7 @@
 package android.content.pm;
 
 public final class ServiceInfo {
+    public static RuntimeException copyFailure;
     public String packageName;
     public String name;
     public String processName;
@@ -14,6 +15,7 @@ public final class ServiceInfo {
     public ServiceInfo() {}
 
     public ServiceInfo(ServiceInfo other) {
+        if (copyFailure != null) throw copyFailure;
         packageName = other.packageName;
         name = other.name;
         processName = other.processName;

@@ -9,12 +9,14 @@ public final class Intent {
     private final String action;
     private final Map<String, String> extras = new HashMap<>();
     public RuntimeException readFailure;
+    public RuntimeException actionFailure;
 
     public Intent(String action) {
         this.action = action;
     }
 
     public String getAction() {
+        if (actionFailure != null) throw actionFailure;
         return action;
     }
 

@@ -11,8 +11,8 @@ android {
         applicationId 'lx.fix'
         minSdk 26
         targetSdk 35
-        versionCode 4
-        versionName '0.2.2'
+        versionCode 5
+        versionName '0.3.0'
     }
 
     def signingStore = System.getenv('LX_STOP_FIX_KEYSTORE')
@@ -29,8 +29,9 @@ android {
 
     buildTypes {
         release {
-            // The module is small; retain the entry class and readable stack traces.
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             if (signingStore) signingConfig signingConfigs.release
         }
     }
@@ -43,5 +44,5 @@ android {
 
 dependencies {
     // Supplied by LSPosed at runtime; never include this API in the APK.
-    compileOnly files('libs/xposed-api-82.jar')
+    compileOnly files('libs/libxposed-api-102.jar')
 }

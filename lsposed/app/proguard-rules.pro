@@ -1,0 +1,3 @@
+-dontwarn io.github.libxposed.annotation.**
+-keeppackagenames dev.bucket.lxmusic.stopfix
+-keep,allowoptimization class dev.bucket.lxmusic.stopfix.LxModule { *; }
